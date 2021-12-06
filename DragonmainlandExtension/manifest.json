@@ -1,0 +1,33 @@
+{
+    "name": "Dragonmainland Helper",
+    "version": "0.1",
+    "description": "Helper Code for Dragonmainland",
+    "permissions": ["activeTab", "declarativeContent", "storage", "tabs"],
+    "icons": {
+      "16": "images/dm_16.png",
+      "48": "images/dm_48.png"
+    },
+    "browser_action": {
+        "default_popup": "popup.html",
+        "default_title": "Dragonmainland Helper",
+        "default_icon": {
+      "16": "images/dm_16.png",
+      "48": "images/dm_48.png"
+        }
+    },
+    "background": {
+      "scripts": ["options.js", "background.js"],
+      "persistent": false
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://dragonmainland.io/*"],
+            "js": ["options.js", "contentScript.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "web_accessible_resources": [
+      "body-parts.json"
+    ],
+    "manifest_version": 2
+}
