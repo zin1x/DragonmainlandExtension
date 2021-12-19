@@ -120,17 +120,19 @@ async function run() {
             let dragon;
             let family;
             dragon = await getDragonDetails(dragonID);
-            family_species = await getFamilyTreeSpecies(dragonID);
+            family_species_parts = await getFamilyTreeSpecies(dragonID);
 
             //debugLog("result of getDragonDetails..", dragon)
             //debugLog("result of getFamilyTreeSpecies..", family_species)
 
 
-            if (dragon.msg == "OK" && family_species.msg=="OK") {
+            if (dragon.msg == "OK" && family_species_parts.msg=="OK") {
                 var inject=document.createElement("div"); 
                 inject.className = 'addon';
+                inject.alt="aaa"
                 
                 let resttime = 0;
+                console.log(dragon.data)
                 if (Date.now() >parseInt(dragon.data.restEndTime)){
                     //rest time already past
                     resttime=-1;
@@ -140,29 +142,53 @@ async function run() {
                 }
 
                 let inbreed = false;
-                if (deduplicate(family_species.family).length != family_species.family.length){
+                if (deduplicate(family_species_parts.family).length != family_species_parts.family.length){
                     inbreed=true
                 }
 
-                let pure = false;
-                if (deduplicate(family_species.species).length==1){
-                    pure=true
+                let pureFam = false;
+                if (deduplicate(family_species_parts.species).length==1){
+                    pureFam=true
+                }
+                //console.log(family_species_parts.parts)
+
+                let pureParts = false;
+                if (deduplicate(family_species_parts.parts).length==1){
+                    pureParts=true
+                    console.log("Parts: pure")
+                }
+                else{
+                    var uniq_parts = deduplicate(family_species_parts.parts)
+                    console.log("Parts: NOT pure;",uniq_parts)
+                    //If parts not pure, extract the first alphabet of each race
+                    //concat into a string, to display the type of parts this dragon might have
+                    pureParts=""
+                    for (i = 0; i < uniq_parts.length; i++) {
+                      pureParts +=uniq_parts[i].substring(0,1);
+                    } 
                 }
 
+
                 let table = document.createElement("table");
-                appendTrait(table, {d: {name: "boneCount"}, r1: {name: "mutation"}, r2: {name: "restEndTime"}, r3:{name:"inbreed"},r4:{name:"pureBreed"}});
-                appendTrait(table, {d: {name: dragon.data.boneCount}, r1: {name: dragon.data.mutation}, r2: {name: resttime}, r3:{name:inbreed}, r4:{name:pure}});
-                
+                appendTrait(table, {r1: {name: "mutation"}, r2: {name: "restEndTime"}, r3:{name:"inbreed"},r4:{name:"pureFamily"},r5:{name:"pureParts"}});
+                appendTrait(table, {r1: {name: dragon.data.mutation}, r2: {name: resttime}, r3:{name:inbreed}, r4:{name:pureFam}, r5    :{name:pureParts}});
+
+          
+
+                console.log("Pure Status:",pureParts)
                 //if it is an egg
                 if (dragon.data.status==1){
-                    appendTrait(table, {d: {name: "CE"}});
-                    appendTrait(table, {d: {name: dragon.data.ce}});
+                    appendTrait(table, {r1: {name: "CE"}, r2: {name: "Level"}});
+                    appendTrait(table, {r1: {name: dragon.data.ce},r2: {name: dragon.data.level}});      
+                }else{
+                    appendTrait(table, {r1: {name: "-"}, r2: {name: "Level"}});
+                    appendTrait(table, {r1: {name: "-"},r2: {name: dragon.data.level}});      
 
                 }
 
                 inject.style["border-color"]= "hsla(0,0%,100%,0.12)"
                 inject.style["font-family"] = "GothamRounded-Medium,GothamRounded"
-                inject.style["font-size"] = "13.2px"
+                inject.style["font-size"] = "12.2px"
                 inject.style["width"] = "100%";
 
                 inject.style["color"] = "#FFFFFF";
@@ -177,13 +203,34 @@ async function run() {
                 inject.style["margin-top"] = "-50%"; //create gap between the button on top
                 inject.style["text-align"]="center";
                 inject.appendChild(table);
-                await sleep(1000);
+                await sleep(1200);
 
                 if (!document.getElementsByClassName("addon")[0]){
-                    //If class "addon" dont already exist, append the stats table
-                    var newdiv = document.getElementsByClassName("btns-wrap-main")[0];
-                    newdiv.parentNode.appendChild(inject, newdiv)
+                    debugLog("Addon Does not Exist")
 
+                    //If class "addon" dont already exist, append the stats table
+
+                    if (document.getElementsByClassName("btns-wrap-main")[0]){
+                        debugLog("btns-wrap-main EXIST")
+                        var newdiv = document.getElementsByClassName("btns-wrap-main")[0];
+                        newdiv.parentNode.appendChild(inject, newdiv)
+
+                    } else {
+                        debugLog("btns-wrap-main DOES NOT EXIST")
+
+                        inject.style["margin-top"] = "-30%"; //create gap between the button on top
+                        var newdiv = document.getElementsByClassName("mid-egg-bottom-stone")[0];
+                        newdiv.appendChild(inject, newdiv)
+
+                    }
+
+
+                }else{
+                    debugLog("Addon Already EXISTED")
+                    //class already exist
+                    var x = document.getElementsByClassName("addon")[0]
+                    inject.style["margin-top"] = "-30%"; //create gap between the button on top
+                    x.replaceWith(inject)
                 }
             }
 
