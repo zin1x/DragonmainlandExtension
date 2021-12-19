@@ -21,5 +21,5 @@ Browsing to https://dragonmainland.io/#/myMainland/myDragonDetail/xxxxxx of any 
 | restEndTime | Countdown timer to next breeding |
 | inbreed | Check for repeated family members in the dragon's entire family line. E.g. no inbreed - if dragons in family line are unique  |
 | pureFamily | Check to see if the dragons in the entire family line belong to 1 race|
-| pureParts | Indicate of all of the dragons in the entire family line only have parts belonging to 1 race. Otherwise indicate "SWTFR" to represent parts from Storm, Water, Thunder, Fire, Rock|
+| pureParts | Indicate of all of the dragons in the entire family line only have parts belonging to 1 race. Otherwise indicate "SWTFW" to represent parts from Stone, Water, Thunder, Fire, Wind|
 | Level | Current level of the dragon|
