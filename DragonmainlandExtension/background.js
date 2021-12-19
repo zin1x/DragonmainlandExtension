@@ -54,7 +54,8 @@ function getDragonDetails(id, sendResponse) {
 
 function getFamilyTreeSpecies(id, sendResponse){
 
-    function traverse(family,species,node){
+    function traverse(family,species,parts,node){
+
          fetch('https://dragonmainland.io/api/game/hero/detail?r='+Date.now(), {
           method: 'POST',
           body: JSON.stringify({
@@ -66,20 +67,36 @@ function getFamilyTreeSpecies(id, sendResponse){
         })
         .then(response => {
             response.json().then(result => {
+
                 if (result.data.father != 0 && result.data.mother!=0){
-                    traverse(family, species, result.data.father) 
-                    traverse(family, species, result.data.mother)
+                    traverse(family, species, parts,result.data.father) 
+                    traverse(family, species, parts,result.data.mother)
                     family.push(result.data.father)
                     family.push(result.data.mother)
 
                     species.push(result.data.clazz)
 
+                   result.data.parts.forEach(function (item, index) {
+                      //console.log(item, index);
+                    //extract the element type from dnaPic (e.g. Stone_eyes)
+                        parts.push(item["dnaPic"].split("_")[0])
+                    });
+                   
                 }else{
                     //sendResponse(dragon);
                    species.push(result.data.clazz)
 
+
+                   result.data.parts.forEach(function (item, index) {
+                      //console.log(item, index);
+                    //extract the element type from dnaPic (e.g. Stone_eyes)
+                        parts.push(item["dnaPic"].split("_")[0])
+                    });
+                   
+                   //console.log(result.data.parts)
+
                     if(species.length==family.length+1){
-                        let object = { "family": family, "species":species, 'msg':"OK"}
+                        let object = { "family": family, "species":species, "parts":parts,'msg':"OK"}
                         sendResponse(object);
 
                     }
@@ -95,7 +112,7 @@ function getFamilyTreeSpecies(id, sendResponse){
 
     }
 
-    traverse([],[], id);
+    traverse([],[], [],id);
 
 }
 
